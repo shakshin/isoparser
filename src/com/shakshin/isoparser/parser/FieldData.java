@@ -24,9 +24,6 @@ public class FieldData {
 
         }
 
-        if (cfg.raw && rawData != null)
-            res += "\nRAW: " + Utils.bin2hex(rawData) +
-                    "\n-------------------------------------------------------";
         return res;
     }
 }
