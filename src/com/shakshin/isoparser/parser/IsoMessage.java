@@ -27,6 +27,7 @@ public class IsoMessage {
     public IsoHeader header;
     public ArrayList<FieldData> fields = new ArrayList<FieldData>();
     public HashMap<Integer, FieldData> isoFields = new HashMap<Integer, FieldData>();
+    public Integer number;
 
     private InputStream in;
     private Configuration cfg;
@@ -51,8 +52,12 @@ public class IsoMessage {
                 FieldData field = new FieldData();
                 field.name = def.name;
                 field.rawData = rawData;
-                field.rawConvertedData = Utils.convertBytes(rawData, cfg.getCharset());
-                field.parsedData = new String(field.rawConvertedData);
+                if (!def.binary) {
+                    field.rawConvertedData = Utils.convertBytes(rawData, cfg.getCharset());
+                    field.parsedData = new String(field.rawConvertedData);
+                } else {
+                    field.parsedData = "(binary)";
+                }
                 fields.add(field);
                 isoFields.put(idx, field);
 
@@ -95,7 +100,8 @@ public class IsoMessage {
 
     public String asText() {
         String res = "";
-        res += "MTI: " + header.mti;
+        res += "Message number: " + number;
+        res += "\nMTI: " + header.mti;
         res += "\nPrimary bitmap: " + Utils.bin2hex(header.bitmap1);
         if (header.bitmap2 != null)
             res += "\nSecondary bitmap: " + Utils.bin2hex(header.bitmap2);

@@ -20,6 +20,7 @@ public class IsoFile {
             IsoMessage msg = IsoMessage.read(cfg, in);
             if (msg == null)
                 break;
+            msg.number = messages.size() + 1;
             messages.add(msg);
         }
     }

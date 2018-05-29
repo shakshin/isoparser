@@ -5,9 +5,11 @@ public class FieldDefinition {
     public String name;
     public LengthType lengthType;
     public Integer length;
-    public FieldDefinition(LengthType ltype, Integer l, String nm) {
+    public boolean binary = false;
+    public FieldDefinition(LengthType ltype, Integer l, String nm, boolean bin) {
         lengthType = ltype;
         length = l;
         name = nm;
+        binary = bin;
     }
 }
