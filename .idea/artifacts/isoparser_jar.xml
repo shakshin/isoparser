@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="isoparser:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/isoparser_jar</output-path>
+    <root id="archive" name="isoparser.jar">
+      <element id="module-output" name="isoparser" />
+    </root>
+  </artifact>
+</component>
