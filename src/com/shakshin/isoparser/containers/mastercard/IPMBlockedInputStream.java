@@ -4,6 +4,13 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+/*
+ISO 8583 parser
+Original code by Sergey V. Shakshin (rigid.mgn@gmail.com)
+
+Mastercard IPM Fixed 1014 (Blocked) layout wrapper
+ */
+
 public class IPMBlockedInputStream extends FilterInputStream {
     private final int BLOCK_SIZE = 1012; // Block payload size
     private final int TRAILER_SIZE = 2; // Block trailer size

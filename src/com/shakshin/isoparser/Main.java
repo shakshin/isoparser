@@ -9,9 +9,17 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
+/*
+ISO 8583 parser
+Original code by Sergey V. Shakshin (rigid.mgn@gmail.com)
+
+CLI entry point
+ */
+
 public class Main {
 
     public static void main(String[] args) {
+
         Configuration cfg = new Configuration(args);
         if (!cfg.isValid()) {
             cfg.printHelp();

@@ -7,8 +7,16 @@ import com.shakshin.isoparser.structure.FieldDefinition;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
+/*
+ISO 8583 parser
+Original code by Sergey V. Shakshin (rigid.mgn@gmail.com)
+
+ISO 8583 message data class
+ */
 
 public class IsoMessage {
     public class IsoFieldNotDefined extends Exception {
@@ -57,6 +65,9 @@ public class IsoMessage {
                     field.parsedData = new String(field.rawConvertedData);
                 } else {
                     field.parsedData = "(binary)";
+                }
+                if (def.mask && cfg.masked) {
+                    field.masked = true;
                 }
                 fields.add(field);
                 isoFields.put(idx, field);

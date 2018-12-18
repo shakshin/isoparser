@@ -4,7 +4,12 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+/*
+ISO 8583 parser
+Original code by Sergey V. Shakshin (rigid.mgn@gmail.com)
 
+RDW layout wrapper
+ */
 public class RDWInputStream extends FilterInputStream {
     private final int HEADER_SIZE = 4; // record header size
 

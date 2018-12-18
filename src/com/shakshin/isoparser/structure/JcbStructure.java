@@ -6,13 +6,20 @@ import com.shakshin.isoparser.parser.IsoMessage;
 import java.util.HashMap;
 import java.util.Map;
 
+/*
+ISO 8583 parser
+Original code by Sergey V. Shakshin (rigid.mgn@gmail.com)
+
+JCB Interchange File structure definition class
+ */
+
 public class JcbStructure extends AbstractStructure {
     private String pdeBuffer = "";
     @Override
     public Map<Integer, FieldDefinition> getIsoFieldsDefinition() {
         HashMap<Integer, FieldDefinition> res = new HashMap<Integer, FieldDefinition>();
 
-        res.put(2, new FieldDefinition(FieldDefinition.LengthType.Embedded, 2, "Bit 2", false));
+        res.put(2, new FieldDefinition(FieldDefinition.LengthType.Embedded, 2, "Bit 2", false, true));
         res.put(3, new FieldDefinition(FieldDefinition.LengthType.Fixed, 6, "Bit 3", false));
         res.put(4, new FieldDefinition(FieldDefinition.LengthType.Fixed, 12, "Bit 4", false));
         res.put(5, new FieldDefinition(FieldDefinition.LengthType.Fixed, 12, "Bit 5", false));

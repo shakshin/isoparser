@@ -3,8 +3,14 @@ package com.shakshin.isoparser.structure;
 import com.shakshin.isoparser.configuration.Configuration;
 import com.shakshin.isoparser.parser.IsoMessage;
 
-import java.util.HashMap;
 import java.util.Map;
+
+/*
+ISO 8583 parser
+Original code by Sergey V. Shakshin (rigid.mgn@gmail.com)
+
+Abstract structure definition class
+ */
 
 public abstract class AbstractStructure {
     public class ApplicationDataParseError extends Exception {

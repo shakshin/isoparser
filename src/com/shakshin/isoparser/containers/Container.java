@@ -7,6 +7,13 @@ import com.shakshin.isoparser.containers.mastercard.IPMPreEditInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+/*
+ISO 8583 parser
+Original code by Sergey V. Shakshin (rigid.mgn@gmail.com)
+
+Container (layout) selector
+ */
+
 public class Container {
     public static InputStream getContainerStream(Configuration cfg, InputStream raw) throws IOException {
         switch (cfg.container) {

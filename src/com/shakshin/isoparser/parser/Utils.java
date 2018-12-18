@@ -8,6 +8,13 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
+/*
+ISO 8583 parser
+Original code by Sergey V. Shakshin (rigid.mgn@gmail.com)
+
+Utility class
+ */
+
 public class Utils {
     public static byte[] convertBytes(byte[] src, Charset from) {
         if (from == Charset.forName("ASCII"))

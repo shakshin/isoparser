@@ -7,6 +7,13 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.BitSet;
 
+/*
+ISO 8583 parser
+Original code by Sergey V. Shakshin (rigid.mgn@gmail.com)
+
+ISO 8583 message header data class
+ */
+
 public class IsoHeader {
     public InputStream in;
 

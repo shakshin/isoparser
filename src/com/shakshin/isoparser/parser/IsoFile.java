@@ -5,6 +5,13 @@ import com.shakshin.isoparser.configuration.Configuration;
 import java.io.InputStream;
 import java.util.LinkedList;
 
+/*
+ISO 8583 parser
+Original code by Sergey V. Shakshin (rigid.mgn@gmail.com)
+
+ISO 8583 file class
+ */
+
 public class IsoFile {
     private InputStream in;
     private Configuration cfg;

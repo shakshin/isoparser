@@ -5,6 +5,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 
+/*
+ISO 8583 parser
+Original code by Sergey V. Shakshin (rigid.mgn@gmail.com)
+
+Mastercard IPM Pre-Edit layout wrapper
+ */
+
 public class IPMPreEditInputStream extends FilterInputStream {
     private final int HEADER_SIZE = 4; // record header size: 4 bytess
     private final int FILE_HEADER_SIZE = 128; // file header size: 128 bytes

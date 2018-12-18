@@ -2,6 +2,13 @@ package com.shakshin.isoparser.configuration;
 
 import java.nio.charset.Charset;
 
+/*
+ISO 8583 parser
+Original code by Sergey V. Shakshin (rigid.mgn@gmail.com)
+
+Working mode configurator and command line arguments parser
+ */
+
 public class Configuration {
     public enum ContainerType { NONE, RDW, MCPREEDIT, MC1014 };
     public enum DataEncoding { ASCII, EBCDIC }
@@ -12,6 +19,7 @@ public class Configuration {
     public Structure structure;
     public String inputFile;
     public boolean raw;
+    public boolean masked;
 
     public boolean isValid() {
         if (inputFile == null)
@@ -51,16 +59,18 @@ public class Configuration {
                         "\n         RDW - layout with RDW prefix" +
                         "\n         McPreEdit - Mastercard Pre-Edit layout" +
                         "\n         Mc1014 - Mastercard 1014-block layout" +
-                        "\n         JCB - JCB Interchange file" +
                         "\n" +
-                        "\n     -structure <structure> - specify internal 8583 structure (fields definition):" +
+                        "\n     -structure <structure> - specify application-level ISO 8583 structure (fields definition):" +
                         "\n         MC - Mastercard IPM file (default)" +
+                        "\n         JCB - JCB Interchange file" +
                         "\n" +
                         "\n     -encoding <encoding> - specify file encoding:" +
                         "\n         ASCII (default)" +
                         "\n         EBCDIC" +
                         "\n" +
                         "\n     -raw - include RAW data for fields" +
+                        "\n" +
+                        "\n     -mask - mask sensitive data (PAN)" +
                         "\n"
 
         );
@@ -72,11 +82,15 @@ public class Configuration {
         structure = Structure.MASTERCARD;
         inputFile = null;
         raw = false;
+        masked = false;
 
         for (int i = 0; i < args.length; i++) {
             switch (args[i].toUpperCase()) {
                 case "-RAW":
                     raw = true;
+                    break;
+                case "-MASK":
+                    masked = true;
                     break;
                 case "-INPUT":
                     i++;

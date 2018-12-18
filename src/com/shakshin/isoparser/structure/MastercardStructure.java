@@ -6,6 +6,13 @@ import com.shakshin.isoparser.parser.IsoMessage;
 import java.util.HashMap;
 import java.util.Map;
 
+/*
+ISO 8583 parser
+Original code by Sergey V. Shakshin (rigid.mgn@gmail.com)
+
+Mastercard IPM File structure definition class
+ */
+
 public class MastercardStructure extends AbstractStructure {
     private String pdsBuffer = "";
 
@@ -13,7 +20,7 @@ public class MastercardStructure extends AbstractStructure {
     public Map<Integer, FieldDefinition> getIsoFieldsDefinition() {
         HashMap<Integer, FieldDefinition> res = new HashMap<Integer, FieldDefinition>();
 
-        res.put(2, new FieldDefinition(FieldDefinition.LengthType.Embedded, 2, "DE 2", false));
+        res.put(2, new FieldDefinition(FieldDefinition.LengthType.Embedded, 2, "DE 2", false, true));
         res.put(3, new FieldDefinition(FieldDefinition.LengthType.Fixed, 6, "DE 3", false));
         res.put(4, new FieldDefinition(FieldDefinition.LengthType.Fixed, 12, "DE 4", false));
         res.put(5, new FieldDefinition(FieldDefinition.LengthType.Fixed, 12, "DE 5", false));
@@ -42,7 +49,7 @@ public class MastercardStructure extends AbstractStructure {
         res.put(50, new FieldDefinition(FieldDefinition.LengthType.Fixed, 3, "DE 50", false));
         res.put(51, new FieldDefinition(FieldDefinition.LengthType.Fixed, 3, "DE 51", false));
         res.put(54, new FieldDefinition(FieldDefinition.LengthType.Embedded, 3, "DE 54", false));
-        res.put(55, new FieldDefinition(FieldDefinition.LengthType.Embedded, 3, "DE 55", false));
+        res.put(55, new FieldDefinition(FieldDefinition.LengthType.Embedded, 3, "DE 55", true));
         res.put(62, new FieldDefinition(FieldDefinition.LengthType.Embedded, 3, "DE 62", false));
         res.put(63, new FieldDefinition(FieldDefinition.LengthType.Embedded, 3, "DE 63", false));
         res.put(71, new FieldDefinition(FieldDefinition.LengthType.Fixed, 8, "DE 71", false));
