@@ -41,5 +41,7 @@ public class Main {
             System.out.println(file.asText());
         else
             System.out.println("No messages parsed");
+
+
     }
 }

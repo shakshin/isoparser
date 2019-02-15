@@ -73,9 +73,10 @@ public class IsoMessage {
                 isoFields.put(idx, field);
 
             } catch (Exception e) {
-                throw  new IsoFieldReadError(e.getMessage());
+                throw new IsoFieldReadError(e.getMessage());
             }
         }
+
         try {
             struc.afterParse(this);
         } catch (AbstractStructure.ApplicationDataParseError e) {

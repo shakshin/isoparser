@@ -66,12 +66,16 @@ public class Utils {
         return buff;
     }
 
+    public static String bin2hex(byte bin) {
+        return String.format("%02x", bin);
+    }
+
     public static String bin2hex(byte[] bin) {
         String res = "";
         for (int i = 0; i  < bin.length; i++) {
             if (i > 0)
                 res += " ";
-            res += String.format("%02x", bin[i]);
+            res += bin2hex(bin[i]);
         }
 
         return res;

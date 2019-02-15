@@ -2,6 +2,10 @@ package com.shakshin.isoparser.parser;
 
 import com.shakshin.isoparser.configuration.Configuration;
 
+import java.beans.XMLEncoder;
+import java.io.BufferedOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.LinkedList;
 
@@ -50,4 +54,5 @@ public class IsoFile {
 
         return res;
     }
+
 }

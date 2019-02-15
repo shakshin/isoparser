@@ -2,7 +2,9 @@ package com.shakshin.isoparser.structure;
 
 import com.shakshin.isoparser.parser.FieldData;
 import com.shakshin.isoparser.parser.IsoMessage;
+import com.shakshin.isoparser.parser.Utils;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,6 +17,13 @@ Mastercard IPM File structure definition class
 
 public class MastercardStructure extends AbstractStructure {
     private String pdsBuffer = "";
+
+    private final static String[] knownEMV = {
+            "9f26", "9f27", "9f10", "9f37", "9f36",
+            "95", "9a", "9c", "9f02", "5f2a", "82",
+            "9f1a", "9f03", "9f34", "9f33", "9f35",
+            "9f1e", "9f53", "84", "9f09", "9f41", "91"
+    };
 
     @Override
     public Map<Integer, FieldDefinition> getIsoFieldsDefinition() {
@@ -70,6 +79,10 @@ public class MastercardStructure extends AbstractStructure {
 
     @Override
     public void afterParse(IsoMessage msg) throws ApplicationDataParseError {
+        try {
+            parseEMV(msg);
+        } catch (Exception e) {}
+
         getPdsBuffer(msg);
         try {
             while (pdsBuffer.length() > 0) {
@@ -86,6 +99,8 @@ public class MastercardStructure extends AbstractStructure {
         } catch (Exception e) {
             throw new ApplicationDataParseError("Can not parse PDS: " + e.getMessage());
         }
+
+
     }
 
     private String bufRead(Integer len) throws ApplicationDataParseError {
@@ -102,5 +117,60 @@ public class MastercardStructure extends AbstractStructure {
         pdsBuffer += msg.isoFields.containsKey(123) ? msg.isoFields.get(123).parsedData : "";
         pdsBuffer += msg.isoFields.containsKey(124) ? msg.isoFields.get(124).parsedData : "";
         pdsBuffer += msg.isoFields.containsKey(125) ? msg.isoFields.get(125).parsedData : "";
+    }
+
+    private void parseEMV(IsoMessage msg) {
+        if (msg.isoFields.get(55) == null)
+            return;
+
+        FieldData de55 = msg.isoFields.get(55);
+        byte[] raw = de55.rawData;
+        int offset = 0;
+        while (offset < raw.length) {
+            String tag = "";
+            String lengthStr = "";
+            Integer length = 0;
+            String data = "";
+
+            tag = Utils.bin2hex(raw[offset++]);
+
+            if (tag.substring(1).equals("f")) {
+                if (offset == raw.length) {
+                    de55.appParserProblems.add("Can not read next EMV tag name: no enough bytes in buffer. Current read data: " + tag);
+                    break;
+                }
+                tag += Utils.bin2hex(raw[offset++]);
+            }
+
+            if (offset == raw.length) {
+                de55.appParserProblems.add("Can not read next EMV tag length: no enough bytes in buffer. Tag name: " + tag);
+                break;
+            }
+            lengthStr = Utils.bin2hex(raw[offset++]);
+            length = Integer.decode("0x" + lengthStr);
+
+            if (offset + length > raw.length) {
+                de55.appParserProblems.add("Can not read next EMV tag data: no enough bytes in buffer. Tag name: " + tag + "; Declared length: " + length.toString() + "; Actual bytes: " + (raw.length - offset));
+                break;
+            }
+            byte[] dataR = new byte[length];
+            for (int i = 0; i < length; i++)
+                dataR[i] = raw[offset+i];
+
+            data = Utils.bin2hex(dataR);
+
+            offset += length;
+
+            FieldData fd = new FieldData();
+            fd.name = tag;
+            fd.parsedData = data;
+
+            de55.children.add(fd);
+
+            if (!Arrays.asList(knownEMV).contains(tag))
+                de55.appParserProblems.add("Unknown EMV tag name: " + tag);
+        }
+
+
     }
 }
