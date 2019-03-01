@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.List;
 
 /*
 ISO 8583 parser
@@ -79,5 +82,59 @@ public class Utils {
         }
 
         return res;
+    }
+
+    public static void parseBerTLV(byte[] raw, List<FieldData> target, List<String> problems) {
+        int offset = 0;
+        while (offset < raw.length) {
+            String tag = "";
+            String lengthStr = "";
+            Integer length = 0;
+            String data = "";
+
+            tag = Utils.bin2hex(raw[offset++]);
+
+            if (tag.substring(1).equals("f")) {
+                if (offset == raw.length) {
+                    problems.add("Can not read next EMV tag name: no enough bytes in buffer. Current read data: " + tag);
+                    break;
+                }
+
+                while (true) {
+                    byte lastTagByte = raw[offset++];
+                    tag += Utils.bin2hex(lastTagByte);
+                    BitSet bs = BitSet.valueOf(new byte[]{lastTagByte});
+                    if (!bs.get(7)) {
+                        break;
+                    }
+                }
+
+            }
+
+            if (offset == raw.length) {
+                problems.add("Can not read next EMV tag length: no enough bytes in buffer. Tag name: " + tag);
+                break;
+            }
+            lengthStr = Utils.bin2hex(raw[offset++]);
+            length = Integer.decode("0x" + lengthStr);
+
+            if (offset + length > raw.length) {
+                problems.add("Can not read next EMV tag data: no enough bytes in buffer. Tag name: " + tag + "; Declared length: " + length.toString() + "; Actual bytes: " + (raw.length - offset));
+                break;
+            }
+            byte[] dataR = new byte[length];
+            for (int i = 0; i < length; i++)
+                dataR[i] = raw[offset + i];
+
+            data = Utils.bin2hex(dataR);
+
+            offset += length;
+
+            FieldData fd = new FieldData();
+            fd.name = tag;
+            fd.parsedData = data;
+
+            target.add(fd);
+        }
     }
 }
