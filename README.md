@@ -1,26 +1,19 @@
 ISO 8583 Parser
 =================
-ISO 8583 Parser - консольное Java-приложение для разбора и просмотра содержимого 
-файлов на основе формата ISO 8583. Так же может использоваться в качестве 
-библиотеки в других проектах.
+ISO 8593 Parser is comand-line Java application that parses and displays ISO 8583 based files.
+Also cans be used as a library for third-party applications.
 
-На текущий момент поддержаны диалекты:
-- Mastercard IPM
-- JCB Interchange
+Supported ISO 8593 variants:
+- Mastercard IPM files
+- JCB Interchange files
 
-Контейнеры:
+Supported containers:
 - Mastercard Fixed1014
 - Mastercard Pre-Edit
 - RDW
 
-Кодировки:
+Supported encodings:
 - ASCII
-- EBCDIC
-
-
-
-### Ответственные лица ###
-Сергей Шакшин (s.shakshin@compassplus.com)
-
+- EBCDIC (IBM 500)
 
 
