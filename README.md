@@ -5,7 +5,7 @@ Also cans be used as a library for third-party applications.
 
 Supported ISO 8593 variants:
 - Mastercard IPM files
-- JCB Interchange files
+- JCB Interchange files (draft)
 
 Supported containers:
 - Mastercard Fixed1014
