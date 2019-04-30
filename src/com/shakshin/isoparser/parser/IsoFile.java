@@ -1,5 +1,6 @@
 package com.shakshin.isoparser.parser;
 
+import com.shakshin.isoparser.Trace;
 import com.shakshin.isoparser.configuration.Configuration;
 
 import java.beans.XMLEncoder;
@@ -28,9 +29,11 @@ public class IsoFile {
         messages = new LinkedList<IsoMessage>();
 
         while (true) {
+            Trace.log("IsoFile", "### Parsing message number " + (messages.size() + 1));
             IsoMessage msg = IsoMessage.read(cfg, in);
             if (msg == null)
                 break;
+
             msg.number = messages.size() + 1;
             messages.add(msg);
         }

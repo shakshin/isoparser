@@ -3,6 +3,7 @@ package com.shakshin.isoparser.parser;
 import com.shakshin.isoparser.configuration.Configuration;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /*
 ISO 8583 parser
@@ -42,7 +43,7 @@ public class FieldData {
         if (cfg.raw) {
             if (rawData != null) {
                 res += "\nRAW: " + Utils.bin2hex(rawData);
-                if (rawConvertedData != null && rawConvertedData != rawData)
+                if (rawConvertedData != null && !Arrays.equals(rawConvertedData, rawData))
                     res += "\nRAW (converted): " + Utils.bin2hex(rawConvertedData);
 
                 needSplitter = true;

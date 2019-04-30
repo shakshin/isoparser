@@ -1,5 +1,6 @@
 package com.shakshin.isoparser.parser;
 
+import com.shakshin.isoparser.Trace;
 import com.shakshin.isoparser.configuration.Configuration;
 
 import java.io.IOException;
@@ -25,13 +26,17 @@ public class IsoHeader {
 
 
     public void readAndParse() throws IOException {
+        Trace.log("IsoHeader", "Parsing primary bitmap");
         parseBitmap(bitmap1, 1);
         if (fields.contains(1)) {
+            Trace.log("IsoHeader", "Need to read secondary bitmap");
             bitmap2 = new byte[8];
             if (in.read(bitmap2) < 8) {
+                Trace.log("IsoHeader", "Secondary bitmap read failed. No enough data");
                 throw new IOException("Secondary bitmap can not be read: no enough bytes");
             }
             parseBitmap(bitmap2, 2);
+            Trace.log("IsoHeader", "Bitmap(s) parsed");
         }
     }
 
@@ -56,10 +61,13 @@ public class IsoHeader {
         byte[] rawMti = new byte[4];
 
         try {
+            Trace.log("IsoHeader", "Reading MTI");
             int r = _in.read(rawMti);
             if (r <= 0) {
+                Trace.log("IsoHeader", "No more data. EOF reached");
                 return null;
             } else if (r < 4) {
+                Trace.log("IsoHeader", "MTI can not be read. No enough data");
                 throw new IOException("MTI can not be read. No enough bytes.");
             }
 
@@ -67,11 +75,14 @@ public class IsoHeader {
 
             String mti = new String(rawMti);
 
+            Trace.log("IsoHeader", "Reading primary bitmap");
             byte[] bm1 = new byte[8];
             int br = _in.read(bm1);
             if (br == 0) { // no data in stream for next message
+                Trace.log("IsoHeader", "EOF reached");
                 return null;
             } else if (br < 8) {
+                Trace.log("IsoHeader", "Primary bitmap can not be read. No enough data");
                 throw new IOException("Primary bitmap can not be read. No enough bytes.");
             }
 
@@ -83,6 +94,7 @@ public class IsoHeader {
             return hdr;
 
         } catch (IOException e) {
+            Trace.log("IsoHeader", "Can not read header: " + e.getMessage());
             System.out.println("Can not read ISO 8583 header: " + e.getMessage());
             return null;
         }

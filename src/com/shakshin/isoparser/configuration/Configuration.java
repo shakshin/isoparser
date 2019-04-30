@@ -1,5 +1,7 @@
 package com.shakshin.isoparser.configuration;
 
+import sun.security.krb5.Config;
+
 import java.nio.charset.Charset;
 
 /*
@@ -10,6 +12,9 @@ Working mode configurator and command line arguments parser
  */
 
 public class Configuration {
+
+    private static Configuration instance = null;
+
     public enum ContainerType { NONE, RDW, MCPREEDIT, MC1014 };
     public enum DataEncoding { ASCII, EBCDIC }
     public enum Structure { MASTERCARD, JCB }
@@ -20,6 +25,10 @@ public class Configuration {
     public String inputFile;
     public boolean raw;
     public boolean masked;
+    public boolean trace;
+    public boolean nodump;
+
+
 
     public boolean isValid() {
         if (inputFile == null)
@@ -71,21 +80,46 @@ public class Configuration {
                         "\n     -raw - include RAW data for fields" +
                         "\n" +
                         "\n     -mask - mask sensitive data (PAN)" +
+                        "\n" +
+                        "\n     -trace - trace to debug log" +
+                        "\n" +
+                        "\n     -nodump - no dump will be printed" +
                         "\n"
 
         );
     }
 
-    public Configuration(String[] args) {
+    public static Configuration get(String[] args) {
+        if (instance == null) {
+            instance = new Configuration(args);
+        }
+        return instance;
+    }
+
+    public static Configuration get() {
+        return instance;
+    }
+
+
+
+    private Configuration(String[] args) {
         container = ContainerType.NONE;
         encoding = DataEncoding.ASCII;
         structure = Structure.MASTERCARD;
         inputFile = null;
         raw = false;
         masked = false;
+        trace = false;
+        nodump = false;
 
         for (int i = 0; i < args.length; i++) {
             switch (args[i].toUpperCase()) {
+                case "-TRACE":
+                    trace = true;
+                    break;
+                case "-NODUMP":
+                    nodump = true;
+                    break;
                 case "-RAW":
                     raw = true;
                     break;

@@ -1,5 +1,7 @@
 package com.shakshin.isoparser.containers;
 
+import com.shakshin.isoparser.Trace;
+
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,10 +28,12 @@ public class RDWInputStream extends FilterInputStream {
     public RDWInputStream(InputStream in, boolean integrityControl) {
         super(in);
         this.integrityControl = integrityControl;
+        Trace.log("RDW", "Container created");
     }
 
     private void readHeader() throws IOException
     {
+        Trace.log("RDW", "Reading RDW header");
         //read header bytes
         byte[] size = new byte[HEADER_SIZE];
         int rBytes;
@@ -40,8 +44,10 @@ public class RDWInputStream extends FilterInputStream {
             return;
         }
 
-        if (rBytes < HEADER_SIZE && integrityControl) // check header integrity
+        if (rBytes < HEADER_SIZE && integrityControl) {// check header integrity
+            Trace.log("RDW", "Header read failed. No enough data.");
             throw new IOException("RDW message integrity violated. Header read failed.");
+        }
         // parse header data to get message size
         ByteBuffer sBuff = ByteBuffer.wrap(size);
         messageSize = sBuff.getInt();
@@ -59,8 +65,10 @@ public class RDWInputStream extends FilterInputStream {
         // read payload data
         int res = in.read();
 
-        if (res == -1 && integrityControl && counter > 0) // check payload integrity
+        if (res == -1 && integrityControl && counter > 0) {// check payload integrity
+            Trace.log("RDW", "Message length mismatch");
             throw new IOException("RDW message integrity violated. Message length mismatch");
+        }
 
         if (res != -1)
             counter++;

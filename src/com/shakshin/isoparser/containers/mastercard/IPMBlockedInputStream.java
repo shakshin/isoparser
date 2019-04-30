@@ -1,5 +1,7 @@
 package com.shakshin.isoparser.containers.mastercard;
 
+import com.shakshin.isoparser.Trace;
+
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,6 +23,7 @@ public class IPMBlockedInputStream extends FilterInputStream {
     public IPMBlockedInputStream(InputStream in, boolean integrityControl) {
         super(in);
         this.integrityControl = integrityControl;
+        Trace.log("Fixed1014", "Container created");
     }
 
     public IPMBlockedInputStream(InputStream in) {
@@ -30,16 +33,21 @@ public class IPMBlockedInputStream extends FilterInputStream {
     @Override
     public int read() throws IOException {
         if (counter == BLOCK_SIZE) { // end of block payload reached. need to read trailer
+            Trace.log("Fixed1014", "End of block reached. reading trailer");
             byte[] skip = new byte[TRAILER_SIZE];
             int skipped = in.read(skip);
-            if (integrityControl && skipped < TRAILER_SIZE) // check trailer integrity
+            if (integrityControl && skipped < TRAILER_SIZE) { // check trailer integrity
+                Trace.log("Fixed1014", "Trailer size mismatch");
                 throw new IOException("Fixed_1014 block integrity violated.");
+            }
             counter = 0;
         }
         // read block payload
         int res = super.read();
-        if (res == -1 && integrityControl && counter > 0) // check integrity
+        if (res == -1 && integrityControl && counter > 0) { // check integrity
+            Trace.log("Fixed1014", "EOF reached earlier that end of block. DAta is not arranged");
             throw new IOException("Fixed_1014 block integrity violated.");
+        }
         if (res != -1) {
             counter++;
         }

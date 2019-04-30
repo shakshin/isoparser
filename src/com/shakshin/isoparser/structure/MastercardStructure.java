@@ -1,5 +1,6 @@
 package com.shakshin.isoparser.structure;
 
+import com.shakshin.isoparser.Trace;
 import com.shakshin.isoparser.parser.FieldData;
 import com.shakshin.isoparser.parser.IsoMessage;
 import com.shakshin.isoparser.parser.Utils;
@@ -21,6 +22,7 @@ public class MastercardStructure extends AbstractStructure {
 
     @Override
     public Map<Integer, FieldDefinition> getIsoFieldsDefinition() {
+        Trace.log("MC", "Preparing field definitions");
         HashMap<Integer, FieldDefinition> res = new HashMap<Integer, FieldDefinition>();
 
         res.put(2, new FieldDefinition(FieldDefinition.LengthType.Embedded, 2, "DE 2", false, true));
@@ -73,17 +75,23 @@ public class MastercardStructure extends AbstractStructure {
 
     @Override
     public void afterParse(IsoMessage msg) throws ApplicationDataParseError {
+        Trace.log("MC", "Performing application-level parsing");
         try {
             parseEMV(msg);
+            Trace.log("MC", "EMV parser finished");
         } catch (Exception e) {}
 
+        Trace.log("MC", "parsing PDS-fields");
         getPdsBuffer(msg);
         try {
             while (pdsBuffer.length() > 0) {
                 String tag = bufRead(4);
+                Trace.log("MC", "PDS tag: " + tag);
                 String len = bufRead(3);
+                Trace.log("MC", "PDS length " + len);
                 Integer l = Integer.parseInt(len);
                 String data = bufRead(l);
+                Trace.log("MC", "PDS tag data read ok");
 
                 FieldData d = new FieldData();
                 d.name = "pds" + tag;
@@ -91,6 +99,7 @@ public class MastercardStructure extends AbstractStructure {
                 msg.fields.add(d);
             }
         } catch (Exception e) {
+            Trace.log("MC", "Can not parse PDS: " + e.getMessage());
             throw new ApplicationDataParseError("Can not parse PDS: " + e.getMessage());
         }
 
@@ -106,6 +115,7 @@ public class MastercardStructure extends AbstractStructure {
     }
 
     private void getPdsBuffer(IsoMessage msg) {
+        Trace.log("MC", "Combining additional data fields to single buffer");
         pdsBuffer += msg.isoFields.containsKey(48) ? msg.isoFields.get(48).parsedData : "";
         pdsBuffer += msg.isoFields.containsKey(62) ? msg.isoFields.get(62).parsedData : "";
         pdsBuffer += msg.isoFields.containsKey(123) ? msg.isoFields.get(123).parsedData : "";
@@ -114,11 +124,11 @@ public class MastercardStructure extends AbstractStructure {
     }
 
     private void parseEMV(IsoMessage msg) {
+        Trace.log("MC", "Parsing EMV data");
         if (msg.isoFields.get(55) == null)
             return;
 
         FieldData de55 = msg.isoFields.get(55);
-        byte[] raw = de55.rawData;
 
         Utils.parseBerTLV(de55.rawData, de55.children, de55.appParserProblems);
 

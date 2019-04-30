@@ -1,5 +1,6 @@
 package com.shakshin.isoparser.parser;
 
+import com.shakshin.isoparser.Trace;
 import com.shakshin.isoparser.configuration.Configuration;
 import com.shakshin.isoparser.structure.AbstractStructure;
 import com.shakshin.isoparser.structure.FieldDefinition;
@@ -46,14 +47,19 @@ public class IsoMessage {
     }
 
     private void parse(AbstractStructure struc) throws IsoFieldNotDefined, IsoFieldReadError {
+        Trace.log("IsoMessage", "Parsing fields");
         Map<Integer, FieldDefinition> defs = struc.getIsoFieldsDefinition();
+        Trace.log("IsoMessage", "Got fields definitions from structure");
         for (int i = 0; i < header.fields.size(); i++) {
             Integer idx = header.fields.get(i);
             if (idx == 1)
                 continue; // secondary bitmap
+            Trace.log("IsoMessage", "Reading field " + idx);
             FieldDefinition def = defs.get(idx);
-            if (def == null)
+            if (def == null) {
+                Trace.log("IsoMessage", "Field definition is not present: " + idx);
                 throw new IsoFieldNotDefined(idx);
+            }
             try {
                 byte[] rawData = Utils.readFromStream(in, def, cfg);
 
@@ -73,28 +79,32 @@ public class IsoMessage {
                 isoFields.put(idx, field);
 
             } catch (Exception e) {
+                Trace.log("IsoMessage", "Field read error: " + e.getMessage());
                 throw new IsoFieldReadError(e.getMessage());
             }
         }
 
         try {
+            Trace.log("IsoMessage", "Invoking application-level parser");
             struc.afterParse(this);
         } catch (AbstractStructure.ApplicationDataParseError e) {
-            System.out.println("(warning) " + e.getMessage());
+            Trace.log("IsoMessage", "Application-level parser error: " + e.getMessage());
         }
     }
 
     public static IsoMessage read(Configuration _cfg, InputStream _in) {
         try {
+            Trace.log("IsoMessage", "Reading message");
             IsoHeader hdr = IsoHeader.read(_cfg, _in);
             if (hdr != null) {
+                Trace.log("IsoMessage", "ISO header read ok");
                 IsoMessage msg = new IsoMessage(_cfg, _in);
                 msg.header = hdr;
                 msg.header.readAndParse();
 
                 AbstractStructure struc = AbstractStructure.getStructure(_cfg);
                 if (struc == null) {
-                    System.out.println("No message structure selected");
+                    Trace.log("IsoMessage", "No structure defined");
                     return null;
                 }
 
@@ -102,10 +112,11 @@ public class IsoMessage {
 
                 return msg;
             } else {
+                Trace.log("IsoMessage", "Header was not read");
                 return null;
             }
         } catch (Exception e) {
-            System.out.println("ISO message can not be read: " + e.getMessage());
+            Trace.log("IsoMessage", "Message can not be parsed: " + e.getMessage());
             return null;
         }
     }

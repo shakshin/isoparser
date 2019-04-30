@@ -1,5 +1,7 @@
 package com.shakshin.isoparser.containers.mastercard;
 
+import com.shakshin.isoparser.Trace;
+
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,29 +28,35 @@ public class IPMPreEditInputStream extends FilterInputStream {
 
     public IPMPreEditInputStream(InputStream in) throws IOException {
         super(in);
+        Trace.log("Pre-Edit", "Container created");
         readFileHeader(); // need to read file record after initialization
     }
 
     public IPMPreEditInputStream(InputStream in, boolean integrityControl) throws IOException {
         super(in);
         this.integrityControl = integrityControl;
+        Trace.log("Pre-Edit", "Container created");
         readFileHeader(); // need to read file header after initialization
     }
 
     private void readFileHeader() throws IOException { // just read bytes to byte array
+        Trace.log("Pre-Edit", "Reading file header");
         fileHeader = new byte[FILE_HEADER_SIZE];
         int rBytes = in.read(fileHeader);
-        if (rBytes != FILE_HEADER_SIZE && integrityControl) // check header size
+        if (rBytes != FILE_HEADER_SIZE && integrityControl) { // check header size
+            Trace.log("Pre-Edit", "File header size mismatch");
             throw new IOException("Pre-Edit file header read failed");
+        }
     }
 
     private void readHeader() throws IOException
     {
+        Trace.log("Pre-Edit", "Reading message header");
         if (isFirstRecord) // reset first record indicator
             isFirstRecord = false;
         else { // or do alignment to 4 bytes
             int toSkip = 4 - (messageSize % 4);
-            if (toSkip > 0 && toSkip < 4) {
+            if (toSkip < 4) {
                 byte[] skip = new byte[toSkip];
                 in.read(skip);
             }
@@ -62,10 +70,14 @@ public class IPMPreEditInputStream extends FilterInputStream {
             state = 1;
             return;
         }
-        if (rBytes < HEADER_SIZE && integrityControl) // check header size
+        if (rBytes < HEADER_SIZE && integrityControl) {// check header size
+            Trace.log("Pre-Edit", "Message header read failed. No enough data.");
             throw new IOException("Pre-Edit message integrity violated. Header read failed.");
-        if (size[0] != 64 && integrityControl) // check header format
+        }
+        if (size[0] != 64 && integrityControl) {// check header format
+            Trace.log("Pre-Edit", "Message header read failed. Incorrect header format.");
             throw new IOException("Pre-Edit message integrity violated. Incorrect record size format");
+        }
         size[0] = 0; // pre-edit specific manipulation with header data
         ByteBuffer sBuff = ByteBuffer.wrap(size);
         messageSize = sBuff.getInt(); // set current message size
@@ -81,8 +93,10 @@ public class IPMPreEditInputStream extends FilterInputStream {
             }
         }
         int res = in.read();
-        if (res == -1 && integrityControl && counter > 0) // check record integrity
+        if (res == -1 && integrityControl && counter > 0) {// check record integrity
+            Trace.log("Pre-Edit", "Message length mismatch");
             throw new IOException("Pre-Edit message integrity violated. Message length mismatch");
+        }
         if (res != -1)
             counter++;
         if (counter == messageSize) { // end of record reached. reset counter and set state

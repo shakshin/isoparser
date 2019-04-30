@@ -20,27 +20,34 @@ public class Main {
 
     public static void main(String[] args) {
 
-        Configuration cfg = new Configuration(args);
+        Configuration cfg = Configuration.get(args);
         if (!cfg.isValid()) {
             cfg.printHelp();
             return;
         }
+        Trace.log("main", "Configuration prepared");
         InputStream in;
         try {
             in = Container.getContainerStream(cfg, new FileInputStream(cfg.inputFile));
+            Trace.log("main", "Input stream opened");
         } catch (FileNotFoundException e) {
-            System.out.println("Input file not found");
+            Trace.log("main", "Input file not found");
             return;
         } catch (IOException e) {
-            System.out.println("File was not opened: " + e.getMessage());
+            Trace.log("main", "Can not open file: " + e.getMessage());
             return;
         }
         IsoFile file = new IsoFile(cfg, in);
 
-        if (file.messages.size() > 0 )
-            System.out.println(file.asText());
-        else
+        if (file.messages.size() > 0 ) {
+            if (!cfg.nodump) {
+                System.out.println(file.asText());
+            } else {
+                System.out.println(String.format("%d messages parsed", file.messages.size()));
+            }
+        } else {
             System.out.println("No messages parsed");
+        }
 
 
     }
