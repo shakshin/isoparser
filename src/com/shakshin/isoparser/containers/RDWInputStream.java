@@ -43,8 +43,12 @@ public class RDWInputStream extends FilterInputStream {
             state = 1;
             return;
         }
-
-        if (rBytes < HEADER_SIZE && integrityControl) {// check header integrity
+        if (rBytes == 0) {
+            Trace.log("RDW", "No bytes read. End of stream.");
+            messageSize = 0;
+            state = 1;
+            return;
+        } else if (rBytes < HEADER_SIZE && integrityControl) {// check header integrity
             Trace.log("RDW", "Header read failed. No enough data.");
             throw new IOException("RDW message integrity violated. Header read failed.");
         }
