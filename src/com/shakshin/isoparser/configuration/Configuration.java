@@ -1,7 +1,5 @@
 package com.shakshin.isoparser.configuration;
 
-import sun.security.krb5.Config;
-
 import java.nio.charset.Charset;
 
 /*
