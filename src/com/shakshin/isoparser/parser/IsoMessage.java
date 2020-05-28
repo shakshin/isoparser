@@ -86,7 +86,7 @@ public class IsoMessage {
 
         try {
             Trace.log("IsoMessage", "Invoking application-level parser");
-            struc.afterParse(this);
+            struc.afterMessageParsed(this);
         } catch (AbstractStructure.ApplicationDataParseError e) {
             Trace.log("IsoMessage", "Application-level parser error: " + e.getMessage());
         }

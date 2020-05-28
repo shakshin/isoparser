@@ -1,6 +1,7 @@
 package com.shakshin.isoparser.structure;
 
 import com.shakshin.isoparser.parser.FieldData;
+import com.shakshin.isoparser.parser.IsoFile;
 import com.shakshin.isoparser.parser.IsoMessage;
 
 import java.util.HashMap;
@@ -66,7 +67,7 @@ public class JcbStructure extends AbstractStructure {
     }
 
     @Override
-    public void afterParse(IsoMessage msg) throws ApplicationDataParseError {
+    public void afterMessageParsed(IsoMessage msg) throws ApplicationDataParseError {
         getPdeBuffer(msg);
         try {
             while (pdeBuffer.length() > 0) {
@@ -83,6 +84,11 @@ public class JcbStructure extends AbstractStructure {
         } catch (Exception e) {
             throw new ApplicationDataParseError("Can not parse PDE: " + e.getMessage());
         }
+    }
+
+    @Override
+    public void afterFileParsed(IsoFile file) {
+
     }
 
     private String bufRead(Integer len) throws ApplicationDataParseError {

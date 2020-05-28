@@ -2,6 +2,7 @@ package com.shakshin.isoparser.structure;
 
 import com.shakshin.isoparser.Trace;
 import com.shakshin.isoparser.parser.FieldData;
+import com.shakshin.isoparser.parser.IsoFile;
 import com.shakshin.isoparser.parser.IsoMessage;
 import com.shakshin.isoparser.parser.Utils;
 
@@ -9,6 +10,7 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /*
 ISO 8583 parser
@@ -19,6 +21,9 @@ Mastercard IPM File structure definition class
 
 public class MastercardStructure extends AbstractStructure {
     private String pdsBuffer = "";
+
+    private Long checksum = Long.valueOf(0);
+    private boolean checksumProblem = false;
 
     @Override
     public Map<Integer, FieldDefinition> getIsoFieldsDefinition() {
@@ -74,7 +79,19 @@ public class MastercardStructure extends AbstractStructure {
     }
 
     @Override
-    public void afterParse(IsoMessage msg) throws ApplicationDataParseError {
+    public void afterMessageParsed(IsoMessage msg) throws ApplicationDataParseError {
+
+        if (msg.isoFields.containsKey(4)) {
+            try {
+                String de4 = msg.isoFields.get(4).parsedData;
+                Long de4l = Long.valueOf(de4);
+                checksum += de4l;
+            } catch (Throwable e) {
+                Trace.log("MC", "DE4 could not be parsed to numeric value: " + e.getMessage());
+                checksumProblem = true;
+            }
+        }
+
         Trace.log("MC", "Performing application-level parsing");
         try {
             parseEMV(msg);
@@ -102,8 +119,12 @@ public class MastercardStructure extends AbstractStructure {
             Trace.log("MC", "Can not parse PDS: " + e.getMessage());
             throw new ApplicationDataParseError("Can not parse PDS: " + e.getMessage());
         }
+    }
 
-
+    @Override
+    public void afterFileParsed(IsoFile file) {
+        file.checksum = checksum.toString();
+        file.checksumProblems = checksumProblem;
     }
 
     private String bufRead(Integer len) throws ApplicationDataParseError {

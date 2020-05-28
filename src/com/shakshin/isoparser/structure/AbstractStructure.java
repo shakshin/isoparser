@@ -1,6 +1,7 @@
 package com.shakshin.isoparser.structure;
 
 import com.shakshin.isoparser.configuration.Configuration;
+import com.shakshin.isoparser.parser.IsoFile;
 import com.shakshin.isoparser.parser.IsoMessage;
 
 import java.util.Map;
@@ -20,19 +21,28 @@ public abstract class AbstractStructure {
         public String getMessage() {return message;}
     }
 
+    private static AbstractStructure instance = null;
+
     public abstract Map<Integer, FieldDefinition> getIsoFieldsDefinition();
 
-    public abstract void afterParse(IsoMessage msg) throws ApplicationDataParseError;
+    public abstract void afterMessageParsed(IsoMessage msg) throws ApplicationDataParseError;
+
+    public abstract void afterFileParsed(IsoFile file);
 
     public static AbstractStructure getStructure(Configuration cfg) {
-        switch (cfg.structure) {
-            case MASTERCARD:
-                return new MastercardStructure();
-            case JCB:
-                return new JcbStructure();
-            default:
-                return null;
+        if (instance == null) {
+            switch (cfg.structure) {
+                case MASTERCARD:
+                    instance = new MastercardStructure();
+                    break;
+                case JCB:
+                    instance = new JcbStructure();
+                    break;
+                default:
+                    instance = null;
+            }
         }
+        return instance;
     }
 
 }

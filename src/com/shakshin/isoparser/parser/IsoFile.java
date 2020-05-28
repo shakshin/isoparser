@@ -2,6 +2,7 @@ package com.shakshin.isoparser.parser;
 
 import com.shakshin.isoparser.Trace;
 import com.shakshin.isoparser.configuration.Configuration;
+import com.shakshin.isoparser.structure.AbstractStructure;
 
 import java.beans.XMLEncoder;
 import java.io.BufferedOutputStream;
@@ -23,6 +24,9 @@ public class IsoFile {
 
     public LinkedList<IsoMessage> messages;
 
+    public String checksum = null;
+    public boolean checksumProblems = false;
+
     public IsoFile(Configuration _cfg, InputStream _in) {
         cfg = _cfg;
         in = _in;
@@ -37,6 +41,8 @@ public class IsoFile {
             msg.number = messages.size() + 1;
             messages.add(msg);
         }
+
+        AbstractStructure.getStructure(cfg).afterFileParsed(this);
     }
 
     public String asText() {
@@ -51,6 +57,13 @@ public class IsoFile {
         for (int i = 0; i < messages.size(); i ++) {
             res += messages.get(i).asText();
             res += "\n=========================================================\n";
+        }
+
+        if (checksum != null) {
+            res += "\nFile checksum: " + checksum + "\n";
+        }
+        if (checksumProblems) {
+            res += "\nOne or more errors met while calculating checksum for the file. Please refer to trace for details. \n";
         }
 
         res += "\nISO 8583 parser by Sergey V. Shakshin";
