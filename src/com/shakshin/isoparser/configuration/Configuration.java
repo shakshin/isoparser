@@ -25,6 +25,7 @@ public class Configuration {
     public boolean masked;
     public boolean trace;
     public boolean nodump;
+    public boolean mainframe;
 
 
 
@@ -75,6 +76,8 @@ public class Configuration {
                         "\n         ASCII (default)" +
                         "\n         EBCDIC" +
                         "\n" +
+                        "\n     -mainframe - use MAINFRAME variant for RDW-based containers" +
+                        "\n" +
                         "\n     -raw - include RAW data for fields" +
                         "\n" +
                         "\n     -mask - mask sensitive data (PAN)" +
@@ -109,9 +112,13 @@ public class Configuration {
         masked = false;
         trace = false;
         nodump = false;
+        mainframe = false;
 
         for (int i = 0; i < args.length; i++) {
             switch (args[i].toUpperCase()) {
+                case "-MAINFRAME":
+                    mainframe = true;
+                    break;
                 case "-TRACE":
                     trace = true;
                     break;

@@ -73,6 +73,8 @@ public class IsoHeader {
 
             rawMti = Utils.convertBytes(rawMti, _cfg.getCharset());
 
+            Trace.log("IsoHeader", "RAW MTI bytes:" + Utils.bin2hex(rawMti));
+
             String mti = new String(rawMti);
 
             Trace.log("IsoHeader", "Reading primary bitmap");

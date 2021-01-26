@@ -20,9 +20,9 @@ public class Container {
             case NONE:
                 return raw;
             case RDW:
-                return new RDWInputStream(raw);
+                return new RDWInputStream(raw, cfg.mainframe);
             case MC1014:
-                return new RDWInputStream(new IPMBlockedInputStream(raw));
+                return new RDWInputStream(new IPMBlockedInputStream(raw), cfg.mainframe);
             case MCPREEDIT:
                 return new IPMPreEditInputStream(raw);
             default:

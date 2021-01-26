@@ -1,6 +1,7 @@
 package com.shakshin.isoparser.containers;
 
 import com.shakshin.isoparser.Trace;
+import com.shakshin.isoparser.parser.Utils;
 
 import java.io.FilterInputStream;
 import java.io.IOException;
@@ -20,14 +21,22 @@ public class RDWInputStream extends FilterInputStream {
     private int counter = 0; // message size counter
     private int state = 0; // reading state
     private int messageSize = 0; // current message size from header
+    private boolean mainframe = false;
 
     public RDWInputStream(InputStream in) {
         super(in);
     }
 
-    public RDWInputStream(InputStream in, boolean integrityControl) {
+    public RDWInputStream(InputStream in, boolean mainframe) {
+        super(in);
+        this.mainframe = mainframe;
+        Trace.log("RDW", "Container created");
+    }
+
+    public RDWInputStream(InputStream in, boolean integrityControl, boolean mainframe) {
         super(in);
         this.integrityControl = integrityControl;
+        this.mainframe = mainframe;
         Trace.log("RDW", "Container created");
     }
 
@@ -53,9 +62,21 @@ public class RDWInputStream extends FilterInputStream {
             throw new IOException("RDW message integrity violated. Header read failed.");
         }
         // parse header data to get message size
-        ByteBuffer sBuff = ByteBuffer.wrap(size);
-        messageSize = sBuff.getInt();
+        if (mainframe) {
+            byte[] mfsize = new byte[4];
+            mfsize[0] = size[2];
+            mfsize[1] = size[3];
+            mfsize[2] = size[0];
+            mfsize[3] = size[1];
+            ByteBuffer sBuff = ByteBuffer.wrap(mfsize);
+            messageSize = sBuff.getInt() - 4;
+        } else {
+            ByteBuffer sBuff = ByteBuffer.wrap(size);
+            messageSize = sBuff.getInt();
+        }
+
         state = 1; // set state
+        Trace.log("RDW", "Header read ok: " + String.valueOf(messageSize) + " bytes  (" + Utils.bin2hex(size) + ")");
     }
 
     @Override
