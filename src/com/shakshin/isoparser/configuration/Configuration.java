@@ -1,5 +1,7 @@
 package com.shakshin.isoparser.configuration;
 
+import com.shakshin.isoparser.containers.mastercard.IPMProbe;
+
 import java.nio.charset.Charset;
 
 /*
@@ -26,6 +28,7 @@ public class Configuration {
     public boolean trace;
     public boolean nodump;
     public boolean mainframe;
+    public boolean probe;
 
 
 
@@ -78,6 +81,8 @@ public class Configuration {
                         "\n" +
                         "\n     -mainframe - use MAINFRAME variant for RDW-based containers" +
                         "\n" +
+                        "\n     -probe - try to detect encoding, container type and mainframe mode" +
+                        "\n" +
                         "\n     -raw - include RAW data for fields" +
                         "\n" +
                         "\n     -mask - mask sensitive data (PAN)" +
@@ -113,9 +118,13 @@ public class Configuration {
         trace = false;
         nodump = false;
         mainframe = false;
+        probe = false;
 
         for (int i = 0; i < args.length; i++) {
             switch (args[i].toUpperCase()) {
+                case "-PROBE":
+                    probe = true;
+                    break;
                 case "-MAINFRAME":
                     mainframe = true;
                     break;
@@ -192,5 +201,14 @@ public class Configuration {
                     break;
             }
         }
+
+        if (probe) {
+            IPMProbe prb = new IPMProbe();
+            prb.probe(inputFile);
+            if (prb.container != null) container = prb.container;
+            if (prb.mainframe != null) mainframe = prb.mainframe.booleanValue();
+            if (prb.encoding != null) encoding = prb.encoding;
+        }
+
     }
 }

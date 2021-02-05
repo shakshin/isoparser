@@ -8,7 +8,7 @@ public class Trace {
         if (cfg == null)
             cfg = Configuration.get();
 
-        if (!cfg.trace) return;
+        if (cfg != null && !cfg.trace) return;
 
         System.out.println(String.format("[%s]: %s", who, msg));
 
