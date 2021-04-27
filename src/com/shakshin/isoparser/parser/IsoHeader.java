@@ -32,7 +32,7 @@ public class IsoHeader {
             Trace.log("IsoHeader", "Need to read secondary bitmap");
             bitmap2 = new byte[8];
             if (in.read(bitmap2) < 8) {
-                Trace.log("IsoHeader", "Secondary bitmap read failed. No enough data");
+                Trace.error("IsoHeader", "Secondary bitmap read failed. No enough data");
                 throw new IOException("Secondary bitmap can not be read: no enough bytes");
             }
             parseBitmap(bitmap2, 2);
@@ -67,7 +67,7 @@ public class IsoHeader {
                 Trace.log("IsoHeader", "No more data. EOF reached");
                 return null;
             } else if (r < 4) {
-                Trace.log("IsoHeader", "MTI can not be read. No enough data");
+                Trace.error("IsoHeader", "MTI can not be read. No enough data");
                 throw new IOException("MTI can not be read. No enough bytes.");
             }
 
@@ -84,7 +84,7 @@ public class IsoHeader {
                 Trace.log("IsoHeader", "EOF reached");
                 return null;
             } else if (br < 8) {
-                Trace.log("IsoHeader", "Primary bitmap can not be read. No enough data");
+                Trace.error("IsoHeader", "Primary bitmap can not be read. No enough data");
                 throw new IOException("Primary bitmap can not be read. No enough bytes.");
             }
 
@@ -96,8 +96,7 @@ public class IsoHeader {
             return hdr;
 
         } catch (IOException e) {
-            Trace.log("IsoHeader", "Can not read header: " + e.getMessage());
-            System.out.println("Can not read ISO 8583 header: " + e.getMessage());
+            Trace.error("IsoHeader", "Can not read header: " + e.getMessage());
             return null;
         }
     }

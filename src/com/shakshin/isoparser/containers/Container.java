@@ -1,5 +1,6 @@
 package com.shakshin.isoparser.containers;
 
+import com.shakshin.isoparser.Trace;
 import com.shakshin.isoparser.configuration.Configuration;
 import com.shakshin.isoparser.containers.mastercard.IPMBlockedInputStream;
 import com.shakshin.isoparser.containers.mastercard.IPMPreEditInputStream;
@@ -26,7 +27,7 @@ public class Container {
             case MCPREEDIT:
                 return new IPMPreEditInputStream(raw);
             default:
-                System.out.println("Unsupported container: " + cfg.container);
+                Trace.error("Container","Unsupported container: " + cfg.container);
                 return null;
         }
     }

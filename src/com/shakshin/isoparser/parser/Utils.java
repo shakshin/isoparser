@@ -31,7 +31,7 @@ public class Utils {
         if (def.lengthType == FieldDefinition.LengthType.Embedded) {
             byte[] rawLength = new byte[def.length];
             if (in.read(rawLength) < def.length) {
-                Trace.log("Utils", "Can not read embedded length for field: " + def.name);
+                Trace.error("Utils", "Can not read embedded length for field: " + def.name);
                 throw new IOException("No enough bytes to read embedded length; Field: " + def.name);
             }
 
@@ -42,7 +42,7 @@ public class Utils {
                 String strLength = new String(rawLength);
                 length = Integer.parseInt(strLength);
             } catch (Exception e) {
-                Trace.log("Utils", "Can not parse embedded length for field: " + def.name);
+                Trace.error("Utils", "Can not parse embedded length for field: " + def.name);
                 throw new IOException("Can not parse embedded length. Field: " + def.name + "; " + e.getMessage(), e);
             }
 
@@ -50,7 +50,7 @@ public class Utils {
                 byte[] buff = readFromStreamFixedLen(in, length);
                 return buff;
             } catch (Exception e) {
-                Trace.log("Utils", "Ca not read data for field: " + def.name);
+                Trace.error("Utils", "Ca not read data for field: " + def.name);
                 throw new IOException("Can not read data: " + e.getMessage()+ "; Field: " + def.name, e);
             }
 
@@ -59,11 +59,11 @@ public class Utils {
                 byte[] buff = readFromStreamFixedLen(in, def.length);
                 return buff;
             } catch (Exception e) {
-                Trace.log("Utils", "Can not rad data for field: " + def.name);
+                Trace.error("Utils", "Can not rad data for field: " + def.name);
                 throw new IOException("Can not read data: " + e.getMessage()+ "; Field: " + def.name, e);
             }
         } else {
-            Trace.log("Utils", "Unsupported field length type");
+            Trace.error("Utils", "Unsupported field length type");
             throw new IOException("Unsupported length type: " + def.lengthType + "; Field: " + def.name);
         }
     }
@@ -71,7 +71,7 @@ public class Utils {
     public static byte[] readFromStreamFixedLen(InputStream in, Integer length) throws IOException {
         byte[] buff = new byte[length];
         if (in.read(buff) < length) {
-            Trace.log("Utils", "No enough data");
+            Trace.error("Utils", "No enough data");
             throw new IOException("No enough bytes to read data");
         }
 
@@ -105,7 +105,7 @@ public class Utils {
 
             if (tag.substring(1).equals("f")) {
                 if (offset == raw.length) {
-                    Trace.log("Utils", "BerTLV tag read failed: " + tag);
+                    Trace.error("Utils", "BerTLV tag read failed: " + tag);
                     problems.add("Can not read next BerTLV tag name: no enough bytes in buffer. Current read data: " + tag);
                     break;
                 }
@@ -122,7 +122,7 @@ public class Utils {
             }
 
             if (offset == raw.length) {
-                Trace.log("Utils", "Can not read BerTLV tag length: " + tag);
+                Trace.error("Utils", "Can not read BerTLV tag length: " + tag);
                 problems.add("Can not read next BerTLV tag length: no enough bytes in buffer. Tag name: " + tag);
                 break;
             }
@@ -130,7 +130,7 @@ public class Utils {
             length = Integer.decode("0x" + lengthStr);
 
             if (offset + length > raw.length) {
-                Trace.log("Utils", "Can not read BerTLV tag data: " + tag);
+                Trace.error("Utils", "Can not read BerTLV tag data: " + tag);
                 problems.add("Can not read next BerTLV tag data: no enough bytes in buffer. Tag name: " + tag + "; Declared length: " + length.toString() + "; Actual bytes: " + (raw.length - offset));
                 break;
             }

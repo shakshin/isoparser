@@ -57,7 +57,7 @@ public class IsoMessage {
             Trace.log("IsoMessage", "Reading field " + idx);
             FieldDefinition def = defs.get(idx);
             if (def == null) {
-                Trace.log("IsoMessage", "Field definition is not present: " + idx);
+                Trace.error("IsoMessage", "Field definition is not present: " + idx);
                 throw new IsoFieldNotDefined(idx);
             }
             try {
@@ -79,7 +79,7 @@ public class IsoMessage {
                 isoFields.put(idx, field);
 
             } catch (Exception e) {
-                Trace.log("IsoMessage", "Field read error: " + e.getMessage());
+                Trace.error("IsoMessage", "Field read error: " + e.getMessage());
                 throw new IsoFieldReadError(e.getMessage());
             }
         }
@@ -88,7 +88,7 @@ public class IsoMessage {
             Trace.log("IsoMessage", "Invoking application-level parser");
             struc.afterMessageParsed(this);
         } catch (AbstractStructure.ApplicationDataParseError e) {
-            Trace.log("IsoMessage", "Application-level parser error: " + e.getMessage());
+            Trace.error("IsoMessage", "Application-level parser error: " + e.getMessage());
         }
     }
 
@@ -104,7 +104,7 @@ public class IsoMessage {
 
                 AbstractStructure struc = AbstractStructure.getStructure(_cfg);
                 if (struc == null) {
-                    Trace.log("IsoMessage", "No structure defined");
+                    Trace.error("IsoMessage", "No structure defined");
                     return null;
                 }
 
@@ -112,11 +112,11 @@ public class IsoMessage {
 
                 return msg;
             } else {
-                Trace.log("IsoMessage", "Header was not read");
+                Trace.error("IsoMessage", "Header was not read");
                 return null;
             }
         } catch (Exception e) {
-            Trace.log("IsoMessage", "Message can not be parsed: " + e.getMessage());
+            Trace.error("IsoMessage", "Message can not be parsed: " + e.getMessage());
             return null;
         }
     }

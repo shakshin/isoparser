@@ -37,7 +37,7 @@ public class IPMBlockedInputStream extends FilterInputStream {
             byte[] skip = new byte[TRAILER_SIZE];
             int skipped = in.read(skip);
             if (integrityControl && skipped < TRAILER_SIZE) { // check trailer integrity
-                Trace.log("Fixed1014", "Trailer size mismatch");
+                Trace.error("Fixed1014", "Trailer size mismatch");
                 throw new IOException("Fixed_1014 block integrity violated.");
             }
             counter = 0;
@@ -45,7 +45,7 @@ public class IPMBlockedInputStream extends FilterInputStream {
         // read block payload
         int res = super.read();
         if (res == -1 && integrityControl && counter > 0) { // check integrity
-            Trace.log("Fixed1014", "EOF reached earlier that end of block. DAta is not arranged");
+            Trace.error("Fixed1014", "EOF reached earlier than end of block. Data is not arranged");
             throw new IOException("Fixed_1014 block integrity violated.");
         }
         if (res != -1) {

@@ -21,20 +21,22 @@ public class Main {
     public static void main(String[] args) {
 
         Configuration cfg = Configuration.get(args);
+        cfg.probe();
         if (!cfg.isValid()) {
             cfg.printHelp();
             return;
         }
         Trace.log("main", "Configuration prepared");
+        Trace.log("main", "Input file: " + cfg.inputFile);
         InputStream in;
         try {
             in = Container.getContainerStream(cfg, new FileInputStream(cfg.inputFile));
             Trace.log("main", "Input stream opened");
         } catch (FileNotFoundException e) {
-            Trace.log("main", "Input file not found");
+            Trace.error("main", "Input file not found");
             return;
         } catch (IOException e) {
-            Trace.log("main", "Can not open file: " + e.getMessage());
+            Trace.error("main", "Can not open file: " + e.getMessage());
             return;
         }
         IsoFile file = new IsoFile(cfg, in);

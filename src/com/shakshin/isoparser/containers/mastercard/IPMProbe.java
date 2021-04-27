@@ -34,20 +34,20 @@ public class IPMProbe {
 
             int rd = in.read(hdr);
             if (rd < 4) {
-                Trace.log("PROBE", "No enough bytes");
+                Trace.error("PROBE", "No enough bytes");
                 return;
             }
 
             byte[] hdrEBCDIC = new byte[] { (byte) 0xF1, (byte) 0xF6, (byte) 0xF4, (byte) 0xF4 };
             byte[] hdrASCII = new byte[] { (byte) 0x31, (byte) 0x36, (byte) 0x34, (byte) 0x34 };
-            byte[] hdrRDW = new byte[] { (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x4A };
-            byte[] hdrMF = new byte[] { (byte) 0x00, (byte) 0x4E, (byte) 0x00, (byte) 0x00 };
+            //byte[] hdrRDW = new byte[] { (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x4A };
+            //byte[] hdrMF = new byte[] { (byte) 0x00, (byte) 0x4E, (byte) 0x00, (byte) 0x00 };
 
-            if (Arrays.equals(hdr, hdrRDW)) {
+            if (hdr[0] == (byte) 0x00 && hdr[1] == (byte) 0x00 && hdr[2] == (byte) 0x00) {
                 Trace.log("PROBE", "RDW header detected");
                 isRdw = true;
                 mainframe = false;
-            } else if (Arrays.equals(hdr, hdrMF)) {
+            } else if (hdr[0] == (byte) 0x00 && hdr[2] == (byte) 0x00 && hdr[3] == (byte) 0x00) {
                 Trace.log("PROBE", "Mainframe RDW header detected");
                 isRdw = true;
                 mainframe = true;
@@ -57,7 +57,7 @@ public class IPMProbe {
                 Trace.log("PROBE", "Reading next 4 bytes of file");
                 rd = in.read(hdr);
                 if (rd < 4) {
-                    Trace.log("PROBE", "No enough bytes");
+                    Trace.error("PROBE", "No enough bytes");
                     return;
                 }
             }
@@ -86,7 +86,7 @@ public class IPMProbe {
 
                     boolean not1014 = false;
                     for (int i = 0; i < 6; i++) {
-                        if (last[i] != (byte) 0x00) {
+                        if (last[i] != (byte) 0x00 && last[i] != (byte) 0x40) {
                             Trace.log("PROBE", "Non-zero byte found. This is not MC 1014");
                             not1014 = true;
                             break;
@@ -113,7 +113,7 @@ public class IPMProbe {
             }
 
         } catch (IOException e) {
-            // probe unsuccessful
+            Trace.log("PROBE", "Probe unsuccessful");
         } finally {
             try {
                 if (in != null) in.close();

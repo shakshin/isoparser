@@ -81,8 +81,6 @@ public class Configuration {
                         "\n" +
                         "\n     -mainframe - use MAINFRAME variant for RDW-based containers" +
                         "\n" +
-                        "\n     -probe - try to detect encoding, container type and mainframe mode" +
-                        "\n" +
                         "\n     -raw - include RAW data for fields" +
                         "\n" +
                         "\n     -mask - mask sensitive data (PAN)" +
@@ -118,14 +116,12 @@ public class Configuration {
         trace = false;
         nodump = false;
         mainframe = false;
-        probe = false;
+        probe = true;
 
         for (int i = 0; i < args.length; i++) {
             switch (args[i].toUpperCase()) {
-                case "-PROBE":
-                    probe = true;
-                    break;
                 case "-MAINFRAME":
+                    probe = false;
                     mainframe = true;
                     break;
                 case "-TRACE":
@@ -146,6 +142,7 @@ public class Configuration {
                     break;
                 case "-STRUCTURE":
                     i++;
+                    probe = false;
                     switch (args[i].toUpperCase()) {
                         case "MASTERCARD":
                         case "MC":
@@ -162,6 +159,7 @@ public class Configuration {
                     break;
                 case "-CONTAINER":
                     i++;
+                    probe = false;
                     switch (args[i].toUpperCase()) {
                         case "NONE":
                             container = ContainerType.NONE;
@@ -183,6 +181,7 @@ public class Configuration {
                     break;
                 case "-ENCODING":
                     i++;
+                    probe = false;
                     switch (args[i].toUpperCase()) {
                         case "ASCII":
                             encoding = DataEncoding.ASCII;
@@ -201,7 +200,9 @@ public class Configuration {
                     break;
             }
         }
+    }
 
+    public void probe() {
         if (probe) {
             IPMProbe prb = new IPMProbe();
             prb.probe(inputFile);
@@ -209,6 +210,5 @@ public class Configuration {
             if (prb.mainframe != null) mainframe = prb.mainframe.booleanValue();
             if (prb.encoding != null) encoding = prb.encoding;
         }
-
     }
 }

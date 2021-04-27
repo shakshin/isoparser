@@ -13,4 +13,8 @@ public class Trace {
         System.out.println(String.format("[%s]: %s", who, msg));
 
     };
+
+    public static void error(String who, String msg) {
+        System.err.println(String.format("[error] [%s]: %s", who, msg));
+    }
 }

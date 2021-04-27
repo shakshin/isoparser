@@ -44,7 +44,7 @@ public class IPMPreEditInputStream extends FilterInputStream {
         fileHeader = new byte[FILE_HEADER_SIZE];
         int rBytes = in.read(fileHeader);
         if (rBytes != FILE_HEADER_SIZE && integrityControl) { // check header size
-            Trace.log("Pre-Edit", "File header size mismatch");
+            Trace.error("Pre-Edit", "File header size mismatch");
             throw new IOException("Pre-Edit file header read failed");
         }
     }
@@ -71,11 +71,11 @@ public class IPMPreEditInputStream extends FilterInputStream {
             return;
         }
         if (rBytes < HEADER_SIZE && integrityControl) {// check header size
-            Trace.log("Pre-Edit", "Message header read failed. No enough data.");
+            Trace.error("Pre-Edit", "Message header read failed. No enough data.");
             throw new IOException("Pre-Edit message integrity violated. Header read failed.");
         }
         if (size[0] != 64 && integrityControl) {// check header format
-            Trace.log("Pre-Edit", "Message header read failed. Incorrect header format.");
+            Trace.error("Pre-Edit", "Message header read failed. Incorrect header format.");
             throw new IOException("Pre-Edit message integrity violated. Incorrect record size format");
         }
         size[0] = 0; // pre-edit specific manipulation with header data
@@ -94,7 +94,7 @@ public class IPMPreEditInputStream extends FilterInputStream {
         }
         int res = in.read();
         if (res == -1 && integrityControl && counter > 0) {// check record integrity
-            Trace.log("Pre-Edit", "Message length mismatch");
+            Trace.error("Pre-Edit", "Message length mismatch");
             throw new IOException("Pre-Edit message integrity violated. Message length mismatch");
         }
         if (res != -1)
