@@ -15,7 +15,7 @@ public class Configuration {
 
     private static Configuration instance = null;
 
-    public enum ContainerType { NONE, RDW, MCPREEDIT, MC1014 };
+    public enum ContainerType { NONE, RDW, MCPREEDIT, MC1014 }
     public enum DataEncoding { ASCII, EBCDIC }
     public enum Structure { MASTERCARD, JCB }
 
@@ -29,7 +29,7 @@ public class Configuration {
     public boolean nodump;
     public boolean mainframe;
     public boolean probe;
-
+    public String report;
 
 
     public boolean isValid() {
@@ -88,6 +88,8 @@ public class Configuration {
                         "\n     -trace - trace to debug log" +
                         "\n" +
                         "\n     -nodump - no dump will be printed" +
+                        "\n" +
+                        "\n     -report <name> - run report using parsed data" +
                         "\n"
 
         );
@@ -117,6 +119,7 @@ public class Configuration {
         nodump = false;
         mainframe = false;
         probe = true;
+        report = null;
 
         for (int i = 0; i < args.length; i++) {
             switch (args[i].toUpperCase()) {
@@ -195,6 +198,11 @@ public class Configuration {
                             break;
                     }
                     break;
+                case "-REPORT":
+                    i++;
+                    nodump = true;
+                    report = args[i];
+                    break;
                 default:
                     System.out.println("Unknown option: " + args[i]);
                     break;
@@ -207,7 +215,7 @@ public class Configuration {
             IPMProbe prb = new IPMProbe();
             prb.probe(inputFile);
             if (prb.container != null) container = prb.container;
-            if (prb.mainframe != null) mainframe = prb.mainframe.booleanValue();
+            if (prb.mainframe != null) mainframe = prb.mainframe;
             if (prb.encoding != null) encoding = prb.encoding;
         }
     }

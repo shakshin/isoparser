@@ -3,6 +3,7 @@ package com.shakshin.isoparser;
 import com.shakshin.isoparser.configuration.Configuration;
 import com.shakshin.isoparser.containers.Container;
 import com.shakshin.isoparser.parser.IsoFile;
+import com.shakshin.isoparser.structure.AbstractStructure;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -44,7 +45,10 @@ public class Main {
         if (file.messages.size() > 0 ) {
             if (!cfg.nodump) {
                 System.out.println(file.asText());
-            } else {
+            } else if (cfg.report != null) {
+                AbstractStructure struc = AbstractStructure.getStructure(cfg);
+                struc.runReport(file, cfg.report);
+            }else {
                 System.out.println(String.format("%d messages parsed", file.messages.size()));
             }
         } else {

@@ -67,4 +67,9 @@ public class FieldData {
 
         return res;
     }
+
+    @Override
+    public String toString() {
+        return "FieldData{"+name+" => "+parsedData+"}";
+    }
 }

@@ -35,6 +35,7 @@ public class IsoMessage {
 
     public IsoHeader header;
     public ArrayList<FieldData> fields = new ArrayList<FieldData>();
+    public HashMap<String, String> namedFields = new HashMap<>();
     public HashMap<Integer, FieldData> isoFields = new HashMap<Integer, FieldData>();
     public Integer number;
 
@@ -90,6 +91,8 @@ public class IsoMessage {
         } catch (AbstractStructure.ApplicationDataParseError e) {
             Trace.error("IsoMessage", "Application-level parser error: " + e.getMessage());
         }
+
+        for (FieldData fd : fields) namedFields.put(fd.name, fd.parsedData);
     }
 
     public static IsoMessage read(Configuration _cfg, InputStream _in) {
@@ -112,7 +115,7 @@ public class IsoMessage {
 
                 return msg;
             } else {
-                Trace.error("IsoMessage", "Header was not read");
+                Trace.log("IsoMessage", "Header was not read");
                 return null;
             }
         } catch (Exception e) {
@@ -133,5 +136,49 @@ public class IsoMessage {
             res += fields.get(i).asText(cfg) + "\n";
         }
         return res;
+    }
+
+    private String getDescription() {
+        String def = header.mti + "-" + isoFields.get(24).parsedData;
+        switch (def) {
+            case "1644-697":
+                return def + ": File Header";
+            case "1644-695":
+                return def + ": File Trailer";
+            case "1644-603":
+                return def + ": Retrieval Request";
+            case "1644-693":
+                return def + ": Text Message";
+            case "1644-699":
+                return def + ": File Reject";
+            case "1644-685":
+                return def + ": Financial Position Detail";
+            case "1644-688":
+                return def + ": Settlement Position Detail";
+            case "1644-680":
+                return def + ": File Currency Summary";
+            case "1644-691":
+                return def + ": Message Exception";
+            case "1644-640":
+                return def + ": Currency Update";
+            case "1240-200":
+                return def + ": First Presentment";
+            case "1240-205":
+            case "1240-282":
+                return def + ": Second Presentment";
+            case "1442-450":
+            case "1442-453":
+            case "1442-451":
+            case "1442-454":
+                return def + ": Chargeback";
+            default:
+                return def;
+        }
+    }
+
+    @Override
+    public String toString() {
+
+        return "IsoMessage{"+getDescription()+"}";
     }
 }

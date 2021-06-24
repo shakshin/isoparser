@@ -25,13 +25,14 @@ public class IsoFile {
     public LinkedList<IsoMessage> messages;
 
     public String checksum = null;
+    public String fileName = null;
     public boolean checksumProblems = false;
 
     public IsoFile(Configuration _cfg, InputStream _in) {
         cfg = _cfg;
         in = _in;
         messages = new LinkedList<IsoMessage>();
-
+        fileName = cfg.inputFile;
         while (true) {
             Trace.log("IsoFile", "### Parsing message number " + (messages.size() + 1));
             IsoMessage msg = IsoMessage.read(cfg, in);

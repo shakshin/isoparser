@@ -15,6 +15,7 @@ public class IPMProbe {
     public Boolean mainframe = null;
 
     public void probe(String path) {
+        if (path == null) return;;
         Trace.log("PROBE", "Start file structure detection");
         FileInputStream in = null;
         try {

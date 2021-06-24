@@ -29,6 +29,8 @@ public abstract class AbstractStructure {
 
     public abstract void afterFileParsed(IsoFile file);
 
+    public abstract void runReport(IsoFile file, String report);
+
     public static AbstractStructure getStructure(Configuration cfg) {
         if (instance == null) {
             switch (cfg.structure) {

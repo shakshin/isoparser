@@ -1,5 +1,6 @@
 package com.shakshin.isoparser.structure;
 
+import com.shakshin.isoparser.Trace;
 import com.shakshin.isoparser.parser.FieldData;
 import com.shakshin.isoparser.parser.IsoFile;
 import com.shakshin.isoparser.parser.IsoMessage;
@@ -106,5 +107,10 @@ public class JcbStructure extends AbstractStructure {
         pdeBuffer += msg.isoFields.containsKey(124) ? msg.isoFields.get(124).parsedData : "";
         pdeBuffer += msg.isoFields.containsKey(125) ? msg.isoFields.get(125).parsedData : "";
         pdeBuffer += msg.isoFields.containsKey(126) ? msg.isoFields.get(126).parsedData : "";
+    }
+
+    @Override
+    public void runReport(IsoFile file, String report) {
+        Trace.error("JCB", "No reports implemented yet");
     }
 }

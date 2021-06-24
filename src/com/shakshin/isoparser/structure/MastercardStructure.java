@@ -6,10 +6,7 @@ import com.shakshin.isoparser.parser.IsoFile;
 import com.shakshin.isoparser.parser.IsoMessage;
 import com.shakshin.isoparser.parser.Utils;
 
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 
 /*
@@ -153,5 +150,111 @@ public class MastercardStructure extends AbstractStructure {
 
         Utils.parseBerTLV(de55.rawData, de55.children, de55.appParserProblems);
 
+    }
+
+    private void runSettleReport(IsoFile file) {
+        if (file.messages.size() > 0 ) {
+            HashMap<String, String> spdDt = new HashMap<>();
+            HashMap<String, Long> spdAmt = new HashMap<>();
+            HashMap<String, Long> fpdAmt = new HashMap<>();
+
+            Set<IsoMessage> fpds = new HashSet<>();
+            Set<IsoMessage> spds = new HashSet<>();
+            HashMap<String, HashSet<IsoMessage>> kSpds = new HashMap<>();
+
+            for (IsoMessage msg : file.messages) {
+                String mti = msg.header.mti;
+                String proc = msg.isoFields.get(24).parsedData;
+                String key = null;
+
+                if (!mti.equals("1644")) continue;
+                //if (proc != "685" && proc != "688")  continue;
+
+                FieldData f50 = msg.isoFields.get(50);
+                FieldData f49 = msg.isoFields.get(49);
+                String f300 = msg.namedFields.get("pds0300");
+                key = (f50 == null ? (f49 == null ? "null" : f49.parsedData) : f50.parsedData) + ":" + f300;
+
+                switch (proc) {
+                    case "685":
+                        fpds.add(msg);
+                        String f394 = msg.namedFields.get("pds0394");
+                        String f395 = msg.namedFields.get("pds0395");
+                        Long l394 = f394 == null ? 0 : Long.parseLong(f394.substring(1));
+                        Long l395 = f395 == null ? 0 : Long.parseLong(f395.substring(1));
+                        fpdAmt.put(key, (fpdAmt.get(key) == null ? 0 : fpdAmt.get(key)) + l394 + l395);
+                        break;
+
+                    case "688":
+                        spds.add(msg);
+
+                        HashSet<IsoMessage> ss = kSpds.get(key);
+                        if (ss == null) ss = new HashSet<>();
+                        ss.add(msg);
+                        kSpds.put(key, ss);
+
+                        String f359 = msg.namedFields.get( "pds0359");
+                        if (f359 != null) spdDt.put(key, f359);
+
+                        String f390 = msg.namedFields.get("pds0390");
+                        String f391 = msg.namedFields.get("pds0391");
+                        Long l390 = f390 == null ? 0 : Long.parseLong(f390.substring(1));
+                        Long l391 = f391 == null ? 0 : Long.parseLong(f391.substring(1));
+
+                        Long samt = l390 + l391;
+                        spdAmt.put(key, (spdAmt.get(key) == null ? 0 : spdAmt.get(key)) + samt);
+
+                        String f392 = msg.namedFields.get( "pds0392");
+                        if (f392 != null) {
+                            for (String item : f392.split("(?<=\\G.{18})")) {
+                                String sf2 = item.substring(3);
+                                Long sf2l = Long.parseLong(sf2);
+                                spdAmt.put(key, (spdAmt.get(key) == null ? 0 : spdAmt.get(key)) + sf2l);
+                            }
+                        }
+                        String f393 = msg.namedFields.get( "pds0393");
+                        if (f393 != null) {
+                            for (String item : f393.split("(?<=\\G.{18})")) {
+                                String sf2 = item.substring(3);
+                                Long sf2l = Long.parseLong(sf2);
+                                spdAmt.put(key, (spdAmt.get(key) == null ? 0 : spdAmt.get(key)) + sf2l);
+                            }
+                        }
+
+                        break;
+                    default:
+                        continue;
+                }
+            }
+
+            HashSet<String> keys = new HashSet<>();
+            keys.addAll(fpdAmt.keySet());
+            keys.addAll(spdAmt.keySet());
+
+            System.out.println("File: '" + file.fileName + "'; FPDS: " + fpdAmt.size() + "; SPDS: " + spdAmt.size());
+
+            for (String key : keys) {
+                Long samt = spdAmt.get(key);
+                Long famt = fpdAmt.get(key);
+                System.out.print((famt != null && samt != null && famt.intValue() == samt.intValue() ? "  MATCHED" : "UNMATCHED") + ": " );
+                System.out.print("Key " + key + "; ");
+                System.out.print("FPD " + (famt == null ? "NOT FOUND" : fpdAmt.get(key).toString()) + "; ");
+                System.out.println("SPD " +  (samt == null ? "NOT FOUND" : samt.toString()));
+            }
+
+        }
+    }
+
+    @Override
+    public void runReport(IsoFile file, String report) {
+        switch (report.toUpperCase()) {
+            case "SETTLE":
+            case "STM":
+            case "SETTLEMENT":
+                runSettleReport(file);
+                break;
+            default:
+                Trace.error("MC", "No such report");
+        }
     }
 }
