@@ -13,7 +13,7 @@ Original code by Sergey V. Shakshin (rigid.mgn@gmail.com)
 
 RDW layout wrapper
  */
-public class RDWInputStream extends FilterInputStream {
+public class RDWInputStream extends BaseInputStream {
     private final int HEADER_SIZE = 4; // record header size
 
     private boolean integrityControl = true; // integrity control enabled by default
@@ -23,17 +23,17 @@ public class RDWInputStream extends FilterInputStream {
     private int messageSize = 0; // current message size from header
     private boolean mainframe = false;
 
-    public RDWInputStream(InputStream in) {
+    public RDWInputStream(CleanInputStream in) {
         super(in);
     }
 
-    public RDWInputStream(InputStream in, boolean mainframe) {
+    public RDWInputStream(CleanInputStream in, boolean mainframe) {
         super(in);
         this.mainframe = mainframe;
         Trace.log("RDW", "Container created");
     }
 
-    public RDWInputStream(InputStream in, boolean integrityControl, boolean mainframe) {
+    public RDWInputStream(CleanInputStream in, boolean integrityControl, boolean mainframe) {
         super(in);
         this.integrityControl = integrityControl;
         this.mainframe = mainframe;

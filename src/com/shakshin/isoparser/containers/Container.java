@@ -16,16 +16,18 @@ Container (layout) selector
  */
 
 public class Container {
-    public static InputStream getContainerStream(Configuration cfg, InputStream raw) throws IOException {
+    public static CleanInputStream getContainerStream(Configuration cfg, InputStream raw) throws IOException {
+        CleanInputStream clean = new CleanInputStream(raw);
+
         switch (cfg.container) {
             case NONE:
-                return raw;
+                return clean;
             case RDW:
-                return new RDWInputStream(raw, cfg.mainframe);
+                return new RDWInputStream(clean, cfg.mainframe);
             case MC1014:
-                return new RDWInputStream(new IPMBlockedInputStream(raw), cfg.mainframe);
+                return new RDWInputStream(new IPMBlockedInputStream(clean), cfg.mainframe);
             case MCPREEDIT:
-                return new IPMPreEditInputStream(raw);
+                return new IPMPreEditInputStream(clean);
             default:
                 Trace.error("Container","Unsupported container: " + cfg.container);
                 return null;

@@ -7,7 +7,6 @@ import com.shakshin.isoparser.parser.IsoMessage;
 import com.shakshin.isoparser.parser.Utils;
 
 import java.util.*;
-import java.util.logging.Logger;
 
 /*
 ISO 8583 parser
@@ -239,9 +238,12 @@ public class MastercardStructure extends AbstractStructure {
                 System.out.print((famt != null && samt != null && famt.intValue() == samt.intValue() ? "  MATCHED" : "UNMATCHED") + ": " );
                 System.out.print("Key " + key + "; ");
                 System.out.print("FPD " + (famt == null ? "NOT FOUND" : fpdAmt.get(key).toString()) + "; ");
-                System.out.println("SPD " +  (samt == null ? "NOT FOUND" : samt.toString()));
-            }
+                System.out.print("SPD " +  (samt == null ? "NOT FOUND" : samt.toString()) + "; ");
 
+
+                System.out.println();
+            }
+            System.out.println();
         }
     }
 

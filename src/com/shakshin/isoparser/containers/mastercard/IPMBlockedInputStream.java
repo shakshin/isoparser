@@ -1,6 +1,8 @@
 package com.shakshin.isoparser.containers.mastercard;
 
 import com.shakshin.isoparser.Trace;
+import com.shakshin.isoparser.containers.BaseInputStream;
+import com.shakshin.isoparser.containers.CleanInputStream;
 
 import java.io.FilterInputStream;
 import java.io.IOException;
@@ -13,20 +15,20 @@ Original code by Sergey V. Shakshin (rigid.mgn@gmail.com)
 Mastercard IPM Fixed 1014 (Blocked) layout wrapper
  */
 
-public class IPMBlockedInputStream extends FilterInputStream {
+public class IPMBlockedInputStream extends BaseInputStream {
     private final int BLOCK_SIZE = 1012; // Block payload size
     private final int TRAILER_SIZE = 2; // Block trailer size
 
     private int counter = 0; // block size counter
     private boolean integrityControl = true; // integrity control enabled by default
 
-    public IPMBlockedInputStream(InputStream in, boolean integrityControl) {
+    public IPMBlockedInputStream(CleanInputStream in, boolean integrityControl) {
         super(in);
         this.integrityControl = integrityControl;
         Trace.log("Fixed1014", "Container created");
     }
 
-    public IPMBlockedInputStream(InputStream in) {
+    public IPMBlockedInputStream(CleanInputStream in) {
         super(in);
     }
 

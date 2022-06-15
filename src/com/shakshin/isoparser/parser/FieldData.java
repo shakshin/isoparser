@@ -18,6 +18,7 @@ public class FieldData {
     public byte[] rawConvertedData;
     public String parsedData;
     public boolean masked = false;
+    public Long offset;
 
     public ArrayList<String> appParserProblems = new ArrayList<String>();
     public ArrayList<FieldData> children = new ArrayList<FieldData>();
@@ -25,10 +26,12 @@ public class FieldData {
     private static final String fieldSplitter = "\n-------------------------------------------------------";
 
     public String asText(Configuration cfg) {
-        if (masked)
-            return name + ": (masked sensitive data)";
+        String nm = name + (offset != null ? " (Offset 0x" + Long.toHexString(offset) + ")" : "");
 
-        String res = name + ": '" + parsedData + "'";
+        if (masked)
+            return nm + ": (masked sensitive data)";
+
+        String res = nm + ": '" + parsedData + "'";
 
         if (appParserProblems.size() > 0) {
             res += "\n  Parsing problems:";

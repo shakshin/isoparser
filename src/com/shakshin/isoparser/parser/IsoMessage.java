@@ -2,6 +2,7 @@ package com.shakshin.isoparser.parser;
 
 import com.shakshin.isoparser.Trace;
 import com.shakshin.isoparser.configuration.Configuration;
+import com.shakshin.isoparser.containers.CleanInputStream;
 import com.shakshin.isoparser.structure.AbstractStructure;
 import com.shakshin.isoparser.structure.FieldDefinition;
 
@@ -38,11 +39,12 @@ public class IsoMessage {
     public HashMap<String, String> namedFields = new HashMap<>();
     public HashMap<Integer, FieldData> isoFields = new HashMap<Integer, FieldData>();
     public Integer number;
+    public Long offset;
 
-    private InputStream in;
+    private CleanInputStream in;
     private Configuration cfg;
 
-    public IsoMessage(Configuration _cfg, InputStream _in) {
+    public IsoMessage(Configuration _cfg, CleanInputStream _in) {
         cfg = _cfg;
         in = _in;
     }
@@ -51,6 +53,13 @@ public class IsoMessage {
         Trace.log("IsoMessage", "Parsing fields");
         Map<Integer, FieldDefinition> defs = struc.getIsoFieldsDefinition();
         Trace.log("IsoMessage", "Got fields definitions from structure");
+
+        String ids = "";
+        for (int i = 0; i < header.fields.size(); i++) ids += String.valueOf(header.fields.get(i)) + " ";
+
+        Trace.log("IsoMessage", "Fields ids: " + ids);
+
+
         for (int i = 0; i < header.fields.size(); i++) {
             Integer idx = header.fields.get(i);
             if (idx == 1)
@@ -62,11 +71,13 @@ public class IsoMessage {
                 throw new IsoFieldNotDefined(idx);
             }
             try {
+                Long off = in.getOffset();
                 byte[] rawData = Utils.readFromStream(in, def, cfg);
 
                 FieldData field = new FieldData();
                 field.name = def.name;
                 field.rawData = rawData;
+                field.offset = off;
                 if (!def.binary) {
                     field.rawConvertedData = Utils.convertBytes(rawData, cfg.getCharset());
                     field.parsedData = new String(field.rawConvertedData);
@@ -95,15 +106,17 @@ public class IsoMessage {
         for (FieldData fd : fields) namedFields.put(fd.name, fd.parsedData);
     }
 
-    public static IsoMessage read(Configuration _cfg, InputStream _in) {
+    public static IsoMessage read(Configuration _cfg, CleanInputStream _in) {
         try {
             Trace.log("IsoMessage", "Reading message");
+            Long off = _in.getOffset();
             IsoHeader hdr = IsoHeader.read(_cfg, _in);
             if (hdr != null) {
                 Trace.log("IsoMessage", "ISO header read ok");
                 IsoMessage msg = new IsoMessage(_cfg, _in);
                 msg.header = hdr;
                 msg.header.readAndParse();
+                msg.offset = off;
 
                 AbstractStructure struc = AbstractStructure.getStructure(_cfg);
                 if (struc == null) {
@@ -127,6 +140,7 @@ public class IsoMessage {
     public String asText() {
         String res = "";
         res += "Message number: " + number;
+        if (offset != null) res += "\nOffset: 0x" + Long.toHexString(offset);
         res += "\nMTI: " + header.mti;
         res += "\nPrimary bitmap: " + Utils.bin2hex(header.bitmap1);
         if (header.bitmap2 != null)
@@ -142,38 +156,43 @@ public class IsoMessage {
         String def = header.mti + "-" + isoFields.get(24).parsedData;
         switch (def) {
             case "1644-697":
-                return def + ": File Header";
+                def += ": File Header";
             case "1644-695":
-                return def + ": File Trailer";
+                def += ": File Trailer";
             case "1644-603":
-                return def + ": Retrieval Request";
+                def += ": Retrieval Request";
             case "1644-693":
-                return def + ": Text Message";
+                def += ": Text Message";
             case "1644-699":
-                return def + ": File Reject";
+                def += ": File Reject";
             case "1644-685":
-                return def + ": Financial Position Detail";
+                def += ": Financial Position Detail";
             case "1644-688":
-                return def + ": Settlement Position Detail";
+                def += ": Settlement Position Detail";
             case "1644-680":
-                return def + ": File Currency Summary";
+                def += ": File Currency Summary";
             case "1644-691":
-                return def + ": Message Exception";
+                def += ": Message Exception";
             case "1644-640":
-                return def + ": Currency Update";
+                def += ": Currency Update";
             case "1240-200":
-                return def + ": First Presentment";
+                def += ": First Presentment";
             case "1240-205":
             case "1240-282":
-                return def + ": Second Presentment";
+                def += ": Second Presentment";
             case "1442-450":
             case "1442-453":
             case "1442-451":
             case "1442-454":
-                return def + ": Chargeback";
+                def += ": Chargeback";
             default:
-                return def;
+                ;
         }
+
+        if (offset != null)
+            def += "; Offfset: " + Long.toHexString(offset);
+
+        return def;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.shakshin.isoparser;
 
 import com.shakshin.isoparser.configuration.Configuration;
+import com.shakshin.isoparser.containers.CleanInputStream;
 import com.shakshin.isoparser.containers.Container;
 import com.shakshin.isoparser.parser.IsoFile;
 import com.shakshin.isoparser.structure.AbstractStructure;
@@ -29,7 +30,7 @@ public class Main {
         }
         Trace.log("main", "Configuration prepared");
         Trace.log("main", "Input file: " + cfg.inputFile);
-        InputStream in;
+        CleanInputStream in;
         try {
             in = Container.getContainerStream(cfg, new FileInputStream(cfg.inputFile));
             Trace.log("main", "Input stream opened");

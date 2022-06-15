@@ -1,6 +1,8 @@
 package com.shakshin.isoparser.containers.mastercard;
 
 import com.shakshin.isoparser.Trace;
+import com.shakshin.isoparser.containers.BaseInputStream;
+import com.shakshin.isoparser.containers.CleanInputStream;
 
 import java.io.FilterInputStream;
 import java.io.IOException;
@@ -14,7 +16,7 @@ Original code by Sergey V. Shakshin (rigid.mgn@gmail.com)
 Mastercard IPM Pre-Edit layout wrapper
  */
 
-public class IPMPreEditInputStream extends FilterInputStream {
+public class IPMPreEditInputStream extends BaseInputStream {
     private final int HEADER_SIZE = 4; // record header size: 4 bytess
     private final int FILE_HEADER_SIZE = 128; // file header size: 128 bytes
 
@@ -26,13 +28,13 @@ public class IPMPreEditInputStream extends FilterInputStream {
     public byte[] fileHeader; // bytes from file header
     private boolean isFirstRecord = true; // first record indicator
 
-    public IPMPreEditInputStream(InputStream in) throws IOException {
+    public IPMPreEditInputStream(CleanInputStream in) throws IOException {
         super(in);
         Trace.log("Pre-Edit", "Container created");
         readFileHeader(); // need to read file record after initialization
     }
 
-    public IPMPreEditInputStream(InputStream in, boolean integrityControl) throws IOException {
+    public IPMPreEditInputStream(CleanInputStream in, boolean integrityControl) throws IOException {
         super(in);
         this.integrityControl = integrityControl;
         Trace.log("Pre-Edit", "Container created");

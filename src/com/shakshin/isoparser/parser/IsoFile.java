@@ -2,6 +2,7 @@ package com.shakshin.isoparser.parser;
 
 import com.shakshin.isoparser.Trace;
 import com.shakshin.isoparser.configuration.Configuration;
+import com.shakshin.isoparser.containers.CleanInputStream;
 import com.shakshin.isoparser.structure.AbstractStructure;
 
 import java.beans.XMLEncoder;
@@ -19,7 +20,7 @@ ISO 8583 file class
  */
 
 public class IsoFile {
-    private InputStream in;
+    private CleanInputStream in;
     private Configuration cfg;
 
     public LinkedList<IsoMessage> messages;
@@ -28,7 +29,7 @@ public class IsoFile {
     public String fileName = null;
     public boolean checksumProblems = false;
 
-    public IsoFile(Configuration _cfg, InputStream _in) {
+    public IsoFile(Configuration _cfg, CleanInputStream _in) {
         cfg = _cfg;
         in = _in;
         messages = new LinkedList<IsoMessage>();
